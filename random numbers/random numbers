@@ -1,0 +1,55 @@
+# guess_game_gui.py
+import random
+import tkinter as tk
+from tkinter import messagebox
+
+class GuessApp:
+    def _init_(self, master, low=1, high=100):
+        self.master = master
+        master.title("Guess the Number")
+        self.low = low
+        self.high = high
+        self.reset_game()
+
+        tk.Label(master, text=f"Guess a number between {low} and {high}:").pack(pady=6)
+        self.entry = tk.Entry(master)
+        self.entry.pack()
+        self.entry.bind("<Return>", lambda e: self.check_guess())
+
+        self.check_btn = tk.Button(master, text="Guess", command=self.check_guess)
+        self.check_btn.pack(pady=6)
+
+        self.hint_label = tk.Label(master, text="")
+        self.hint_label.pack()
+
+        self.reset_btn = tk.Button(master, text="Reset", command=self.reset_game)
+        self.reset_btn.pack(pady=4)
+
+    def reset_game(self):
+        self.secret = random.randint(self.low, self.high)
+        self.attempts = 0
+        self.hint_label_text("New game started. Good luck!")
+
+    def hint_label_text(self, txt):
+        self.hint_label.config(text=txt)
+
+    def check_guess(self):
+        s = self.entry.get().strip()
+        if not s.lstrip('-').isdigit():
+            messagebox.showinfo("Invalid", "Please enter a valid integer.")
+            return
+        guess = int(s)
+        self.attempts += 1
+        if guess < self.secret:
+            self.hint_label_text("Too low. Try again.")
+        elif guess > self.secret:
+            self.hint_label_text("Too high. Try again.")
+        else:
+            messagebox.showinfo("Correct!", f"You guessed {self.secret} in {self.attempts} attempts!")
+            self.reset_game()
+        self.entry.delete(0, tk.END)
+
+if _name_ == "_main_":
+    root = tk.Tk()
+    app = GuessApp(root)
+    root.mainloop()
